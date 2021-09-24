@@ -9,6 +9,18 @@ import (
 	"time"
 )
 
+func GetResolverLoop(c *config.Settings) (*net.Resolver, error) {
+	for i := 0; i < int(c.Start().Seconds()); i++ {
+		r, rErr := GetResolverEx(c)
+		if rErr == nil {
+			return r, rErr
+		} else {
+			time.Sleep(time.Second)
+		}
+	}
+	return nil, errors.New("Can't get resolver for " + c.Resolver())
+}
+
 func GetResolverEx(c *config.Settings) (*net.Resolver, error) {
 	addr := net.ParseIP(c.Resolver())
 	ip := c.Resolver()

@@ -12,10 +12,10 @@ func main() {
 	c, cErr := config.GetConfig()
 	if cErr == nil {
 		c.VLine()
-		r, rErr := dnsutils.GetResolverEx(c)
+		c.VPrintln("Get DNS resolver")
+		r, rErr := dnsutils.GetResolverLoop(c)
 		c.VLine()
 		if rErr == nil {
-			time.Sleep(c.Start())
 			for {
 				for _, d := range c.Domains() {
 					dnsutils.LookUp(c, r, d)
