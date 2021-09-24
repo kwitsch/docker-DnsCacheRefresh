@@ -35,4 +35,4 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64,linux/arm/v6,linux/arm/v7
           push: true
-          tags: kwitsch/unbound:${{ steps.vars.outputs.tag }},kwitsch/unbound:latest
+          tags: kwitsch/dnscacherefresh:${{ steps.vars.outputs.tag }},kwitsch/dnscacherefresh:latest
