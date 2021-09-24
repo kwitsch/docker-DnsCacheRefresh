@@ -1,13 +1,9 @@
-FROM golang AS build-env
+FROM ghcr.io/kwitsch/docker-buildimage:main AS build-env
 
-RUN apt update
-RUN apt install gcc
-ADD src /src
-WORKDIR /src
-RUN go get github.com/ramr/go-reaper
-RUN go build -ldflags "-linkmode external -extldflags -static" -o dnscacherefresh
+ADD src .
+RUN gobuild.sh -o dnscacherefresh
 
 FROM scratch
-COPY --from=build-env /src/dnscacherefresh /dnscacherefresh
+COPY --from=build-env /builddir/dnscacherefresh /dnscacherefresh
 
 ENTRYPOINT ["/dnscacherefresh"]
