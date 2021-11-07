@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"strings"
 	"time"
 )
 
@@ -44,13 +45,16 @@ func GetResolverEx(c *config.Settings) (*net.Resolver, error) {
 }
 
 func GetResolver(resolver string) *net.Resolver {
+	if !strings.Contains(resolver, ":") {
+		resolver += ":53"
+	}
 	res := &net.Resolver{
 		PreferGo: true,
 		Dial: func(ctx context.Context, network, address string) (net.Conn, error) {
 			d := net.Dialer{
 				Timeout: time.Millisecond * time.Duration(10000),
 			}
-			return d.DialContext(ctx, network, resolver+":53")
+			return d.DialContext(ctx, network, resolver)
 		},
 	}
 	return res
