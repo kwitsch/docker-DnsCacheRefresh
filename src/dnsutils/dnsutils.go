@@ -23,38 +23,40 @@ func GetResolverLoop(c *config.Settings) (*net.Resolver, error) {
 }
 
 func GetResolverEx(c *config.Settings) (*net.Resolver, error) {
-	addr := net.ParseIP(c.Resolver())
-	ip := c.Resolver()
+	parts := strings.Split(c.Resolver(), ":")
+	name := parts[0]
+	port := "53"
+	if len(parts) > 1 {
+		port = parts[1]
+	}
+	addr := net.ParseIP(name)
 	if addr != nil {
 		if c.Verbose() {
-			fmt.Println("GetResolverEx:", ip)
+			fmt.Println("GetResolverEx: ", name+":"+port)
 		}
-		return GetResolver(addr.String()), nil
+		return GetResolver(addr.String(), port), nil
 	} else {
-		tReso := GetResolver("127.0.0.11")
+		tReso := GetResolver("127.0.0.11", "53")
 		dRes, dResErr := LookUp(c, tReso, c.Resolver())
 		if dResErr == nil {
-			ip = dRes[0]
+			ip := dRes[0]
 			if c.Verbose() {
 				fmt.Println("GetResolverEx:", c.Resolver(), "(", ip, ")")
 			}
-			return GetResolver(ip), nil
+			return GetResolver(ip, port), nil
 		}
 	}
 	return nil, errors.New("Can't get resolver for " + c.Resolver())
 }
 
-func GetResolver(resolver string) *net.Resolver {
-	if !strings.Contains(resolver, ":") {
-		resolver += ":53"
-	}
+func GetResolver(name, port string) *net.Resolver {
 	res := &net.Resolver{
 		PreferGo: true,
 		Dial: func(ctx context.Context, network, address string) (net.Conn, error) {
 			d := net.Dialer{
 				Timeout: time.Millisecond * time.Duration(10000),
 			}
-			return d.DialContext(ctx, network, resolver)
+			return d.DialContext(ctx, network, name+":"+port)
 		},
 	}
 	return res
