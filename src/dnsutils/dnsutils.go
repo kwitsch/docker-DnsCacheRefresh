@@ -37,11 +37,11 @@ func GetResolverEx(c *config.Settings) (*net.Resolver, error) {
 		return GetResolver(addr.String(), port), nil
 	} else {
 		tReso := GetResolver("127.0.0.11", "53")
-		dRes, dResErr := LookUp(c, tReso, c.Resolver())
+		dRes, dResErr := LookUp(c, tReso, name)
 		if dResErr == nil {
 			ip := dRes[0]
 			if c.Verbose() {
-				fmt.Println("GetResolverEx:", c.Resolver(), "(", ip, ")")
+				fmt.Println("GetResolverEx:", name, "(", ip, ")")
 			}
 			return GetResolver(ip, port), nil
 		}
